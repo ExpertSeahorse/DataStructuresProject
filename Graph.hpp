@@ -1,3 +1,5 @@
+#include <list>
+
 #include "GraphBase.hpp"
 
 
@@ -6,10 +8,14 @@
 
 class Vertex{
     friend class Graph; 
-
     protected:
     std::string label;
     std::list<Vertex> adjacent;
+
+    public:
+    Vertex(const std::string l, const std::list<Vertex> adj): label(l), adjacent(adj) {};
+    Vertex(const std::string l): Vertex(l, std::list<Vertex>()) {};
+    Vertex(const Vertex &v) { label=v.label; adjacent=v.adjacent; };
 };
 
 #endif
@@ -20,10 +26,13 @@ class Vertex{
 
 class Edge{
     friend class Graph; 
-
     protected:
+    Vertex *end1;
+    Vertex *end2;
     int weight;
-    Vertex *end1, *end2;
+
+    public:
+    Edge(Vertex* vtx1, Vertex* vtx2, int w): end1(vtx1), end2(vtx2), weight(w) {};
 };
 
 #endif
@@ -32,7 +41,6 @@ class Edge{
 #ifndef GRAPH_H
 #define GRAPH_H
 
-#include <list>
 
 class Graph : public GraphBase{
     private:
