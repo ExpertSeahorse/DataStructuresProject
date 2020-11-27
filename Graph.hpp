@@ -15,7 +15,7 @@ class Vertex{
     public:
     Vertex(const std::string l, const std::list<Vertex> adj): label(l), adjacent(adj) {};
     Vertex(const std::string l): Vertex(l, std::list<Vertex>()) {};
-    Vertex(const Vertex &v) { label=v.label; adjacent=v.adjacent; };
+    Vertex(const Vertex &v) { label=v.label; adjacent=v.adjacent; };    // Copy
 };
 
 #endif
@@ -33,6 +33,7 @@ class Edge{
 
     public:
     Edge(Vertex* vtx1, Vertex* vtx2, int w): end1(vtx1), end2(vtx2), weight(w) {};
+    Edge(Vertex* vtx1, Vertex* vtx2): Edge(vtx1, vtx2, -1) {};
 };
 
 #endif
@@ -53,7 +54,6 @@ class Graph : public GraphBase{
     void addEdge(std::string label1, std::string label2, unsigned long weight);
     void removeEdge(std::string label1, std::string label2);
     unsigned long shortestPath(std::string startLabel, std::string endLabel, std::vector<std::string> &path);
-
 };
 
 #endif
