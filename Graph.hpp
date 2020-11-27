@@ -33,7 +33,6 @@ class Edge{
 
     public:
     Edge(Vertex* vtx1, Vertex* vtx2, int w): end1(vtx1), end2(vtx2), weight(w) {};
-    Edge(Vertex* vtx1, Vertex* vtx2): Edge(vtx1, vtx2, -1) {};
 };
 
 #endif
@@ -47,6 +46,8 @@ class Graph : public GraphBase{
     private:
     std::list<Vertex> vertices;
     std::list<Edge> edges;
+    std::list<Vertex>::iterator findVertex(std::string, std::list<Vertex>);
+    std::list<Edge>::iterator findEdge(std::string, std::string, std::list<Edge>);
 
     public:
     void addVertex(std::string label);
