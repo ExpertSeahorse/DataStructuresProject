@@ -83,12 +83,12 @@ void Graph::removeEdge(std::string label1, std::string label2){
 
 unsigned long Graph::shortestPath(std::string startLabel, std::string endLabel, std::vector<std::string> &path){
     // Add all vertices to undiscovered list
-    // create distance map for max distance
+    // create distance map for max distanc WalkeWe
     std::list<std::string> vtxs;                // buffer of vertices in string form
     std::map<std::string, std::string> prev;    // The node that is before prev[n]
     std::map<std::string, unsigned long> dist;  // Distances of each node from center
     //std::set<std::string> short_set;          // currently unused
-    std::priority_queue<std::pair<unsigned long, std::string> > short_pq;   // somewhat unused, all nodes are added to it 
+    std::priority_queue<std::pair<unsigned long, std::string> > short_pq;   // somewhat unused, all nodes are added to it (Holds all of the final distances)
     
     // Create buffer and initialize distance and prev maps
     for (auto v : vertices){
@@ -113,11 +113,11 @@ unsigned long Graph::shortestPath(std::string startLabel, std::string endLabel, 
 
         // Update distances + prev node of all adjacent vertices to see if they are lower
         vtx = *findVertex(label);        
-        for(auto v : vtx.adjacent){
+        for(auto v : vtx.adjacent){ //For every vertex in vtx.adjacent (adjacent list of current vertex) 
             edge_weight = findEdge(v->label, label)->weight;    // Find edge from endpoints
             if (dist[v->label] > (dist[label] + edge_weight)){  // if curr_dist < distance through this node, use shorter distance + update prev node
                 dist[v->label] = dist[label] + edge_weight;
-                prev[v->label] = vtx.label;
+                prev[v->label] = vtx.label; //Previous of new vertex becomes the current vertex
             }
         }
     }
@@ -127,10 +127,10 @@ unsigned long Graph::shortestPath(std::string startLabel, std::string endLabel, 
     std::vector<std::string> p;
     unsigned long sum = 0;
     do{
-        p.push_back(current);
-        current = prev[current];
-        sum += findEdge(current, prev[current])->weight;
-    }while(current != startLabel);
+        p.push_back(current); //Add current vertex
+        current = prev[current]; //Gets previous vertex of the current vertex
+        sum += findEdge(current, prev[current])->weight; //UNEEDED
+    }while(current != startLabel); //While our current is not the initial label (back at the starting point)
 
     // print path (debug)
     for (auto i : p)
@@ -166,25 +166,26 @@ std::list<Edge>::iterator Graph::findEdge(std::string label1, std::string label2
     return std::find_if(edges.begin(), edges.end(), edge_exists(label1, label2));
 }
 
+//Compares the distance map and vtx list against each other, if in the vtx list it's undiscovered, every vertex is within distance list
+//Looking to see which entry in distance has the lowest distance and is undiscovered (Distance is a map of labels and distances)
 std::list<std::string>::const_iterator Graph::minDistance(const std::map<std::string, unsigned long>& dist, const std::list<std::string>& vtxs){
     // Find the vertex with the minimum distance in the vtxs list
 
     // Establish needed variable names
-    unsigned long best = std::numeric_limits<unsigned long>::max();
+    unsigned long best = std::numeric_limits<unsigned long>::max(); //Infinity
     std::string label, sticky_label;
     unsigned long distance;
-    //std::list<std::string>::iterator index;
     bool in_vtxs;
 
     // if the vertex has the shortest distance and is in the vtxs list, return it
     for (auto const& vtx : dist){
         label = vtx.first; distance = vtx.second;
-        in_vtxs = (std::find(vtxs.begin(), vtxs.end(), label) != vtxs.end());
-        if ((distance < best) && (in_vtxs)){
+        in_vtxs = (std::find(vtxs.begin(), vtxs.end(), label) != vtxs.end()); //Checking to see if label is in vtxs
+        if ((distance < best) && (in_vtxs)){  //If distance is less than previous minimum distance AND is in the vertex list
             best = distance;
             sticky_label = label;
         }
     }
-    // Return the index of the entry in the list
+    // Return the index of the label in the list
     return std::find(vtxs.begin(), vtxs.end(), sticky_label); 
 }
