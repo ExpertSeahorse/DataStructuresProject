@@ -163,11 +163,10 @@ std::list<Edge>::iterator Graph::findEdge(std::string label1, std::string label2
             return (((e.end1->label == label1) || (e.end1->label == label2)) && ((e.end2->label == label1) || (e.end2->label == label2)));
         };
     };
-
     return std::find_if(edges.begin(), edges.end(), edge_exists(label1, label2));
 }
 
-std::__cxx11::list<std::string>::const_iterator Graph::minDistance(const std::map<std::string, unsigned long>& dist, const std::list<std::string>& vtxs){
+std::list<std::string>::const_iterator Graph::minDistance(const std::map<std::string, unsigned long>& dist, const std::list<std::string>& vtxs){
     // Find the vertex with the minimum distance in the vtxs list
 
     // Establish needed variable names

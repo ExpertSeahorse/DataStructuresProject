@@ -54,9 +54,9 @@ class Graph : public GraphBase{
     std::list<Edge> edges;
     unsigned int size_e = 0;
 
-    std::__cxx11::list<Vertex>::iterator findVertex(std::string);
+    std::list<Vertex>::iterator findVertex(std::string);
     std::list<Edge>::iterator findEdge(std::string, std::string);
-    std::__cxx11::list<std::string>::const_iterator minDistance(const std::map<std::string, unsigned long>& dist, const std::list<std::string>& vtxs);
+    std::list<std::string>::const_iterator minDistance(const std::map<std::string, unsigned long>& dist, const std::list<std::string>& vtxs);
 
     public:
     void addVertex(std::string label);
