@@ -10,12 +10,16 @@ class Vertex{
     friend class Graph; 
     protected:
     std::string label;
-    std::list<Vertex> adjacent;
+    std::list<Vertex*> adjacent;
 
     public:
-    Vertex(const std::string l, const std::list<Vertex> adj): label(l), adjacent(adj) {};
-    Vertex(const std::string l): Vertex(l, std::list<Vertex>()) {};
+    Vertex(const std::string l, const std::list<Vertex*> adj): label(l), adjacent(adj) {};
+    Vertex(const std::string l): Vertex(l, std::list<Vertex*>()) {};
+    Vertex(): Vertex("", std::list<Vertex*>()) {};
+
     Vertex(const Vertex &v) { label=v.label; adjacent=v.adjacent; };    // Copy
+
+    //~Vertex();
 };
 
 #endif
@@ -33,6 +37,7 @@ class Edge{
 
     public:
     Edge(Vertex* vtx1, Vertex* vtx2, int w): end1(vtx1), end2(vtx2), weight(w) {};
+    ~Edge();
 };
 
 #endif
@@ -45,9 +50,13 @@ class Edge{
 class Graph : public GraphBase{
     private:
     std::list<Vertex> vertices;
+    unsigned int size_v = 0;
     std::list<Edge> edges;
-    std::list<Vertex>::iterator findVertex(std::string, std::list<Vertex>);
-    std::list<Edge>::iterator findEdge(std::string, std::string, std::list<Edge>);
+    unsigned int size_e = 0;
+
+    std::__cxx11::list<Vertex>::iterator findVertex(std::string);
+    std::list<Edge>::iterator findEdge(std::string, std::string);
+    std::__cxx11::list<std::string>::const_iterator minDistance(const std::map<std::string, unsigned long>& dist, const std::list<std::string>& vtxs);
 
     public:
     void addVertex(std::string label);
@@ -55,6 +64,9 @@ class Graph : public GraphBase{
     void addEdge(std::string label1, std::string label2, unsigned long weight);
     void removeEdge(std::string label1, std::string label2);
     unsigned long shortestPath(std::string startLabel, std::string endLabel, std::vector<std::string> &path);
+
+    void clear();
+    ~Graph() { clear(); }
 };
 
 #endif
