@@ -8,6 +8,18 @@
 
 #include "Graph.hpp"
 
+void Graph::printE(){
+    for (auto i: edges) {
+        std::cout << "Edge: " << i.end1->label << "     " << i.end2->label << "\n";
+    }
+}
+
+void Graph::printV(){
+    for (auto i: vertices) {
+        std::cout << "Vertex: " << i.label << "\n";
+    }
+}
+
 /*
 Vertex::~Vertex(){
     
@@ -27,6 +39,7 @@ void Graph::addVertex(std::string label){
 
     size_v++;
     vertices.emplace_back(label);
+    std::cout << "Added: " << label << std::endl;
 }
 
 void Graph::removeVertex(std::string label){
@@ -41,9 +54,11 @@ void Graph::removeVertex(std::string label){
     // remove all edges connected to vertex from list
     edges.erase(findEdge(label, label));
     size_v--;
+    std::cout << "Removed: " << label << std::endl;
 }
 
 void Graph::addEdge(std::string label1, std::string label2, unsigned long weight){
+    std::cout << "Starting Edge: " << label1 << ", " << label2 << std::endl;
     // no circular edges
     if (label1 == label2)
         throw 1;
@@ -56,18 +71,35 @@ void Graph::addEdge(std::string label1, std::string label2, unsigned long weight
     if ((i == vertices.end()) || (j == vertices.end()))
         throw 1;
 
-    Vertex vtx1 = *i;
-    Vertex vtx2 = *j;
+    //Vertex* vtx1 = new Vertex(*i);
+    //Vertex* vtx2 = new Vertex(*j);
+    Vertex* vtx1 = &*i;
+    Vertex* vtx2 = &*j;
 
+    std::string lab1, lab2;
     // Make sure that there is not an existing edge
+    /*
+    for (Edge e : edges){
+        lab1 = e.end1->label;
+        lab2 = e.end2->label;
+        if ((lab1 == label1) || (lab1 == lab2)){
+            printE();
+            std::cout << "BBBBBBBBBB" << std::endl;
+            if ((lab2 == label1) || (lab2 == label2))
+                std::cout << "CCCCCCCCCCCCCC" << std::endl;
+        }
+    }
+    */
+    
     if (findEdge(label1, label2) != edges.end())
         throw 1;
-
+    
     // Create an edge and add both vertices to each others' adjacency lists
-    edges.emplace_back(&vtx1, &vtx2, weight);
-    vtx1.adjacent.emplace_back(&vtx2);
-    vtx2.adjacent.emplace_back(&vtx1);
+    edges.emplace_back(vtx1, vtx2, weight);
+    vtx1->adjacent.emplace_back(vtx2);
+    vtx2->adjacent.emplace_back(vtx1);
     size_e++;
+    std::cout << "Added: " << label1 << ", " << label2 << std::endl;
 }
 
 void Graph::removeEdge(std::string label1, std::string label2){
@@ -79,6 +111,7 @@ void Graph::removeEdge(std::string label1, std::string label2){
     else
         throw 1;
     size_e--;
+    std::cout << "Removed: " << label1 << ", " << label2 << std::endl;
 }
 
 unsigned long Graph::shortestPath(std::string startLabel, std::string endLabel, std::vector<std::string> &path){
@@ -100,7 +133,7 @@ unsigned long Graph::shortestPath(std::string startLabel, std::string endLabel, 
 
     Vertex vtx;
     std::string label;
-    int edge_weight;
+    unsigned long edge_weight;
     // Dijkstra
     while (vtxs.size() != 0){
         // Get min element + remove from vtx list
@@ -124,19 +157,20 @@ unsigned long Graph::shortestPath(std::string startLabel, std::string endLabel, 
 
     // All nodes have been charted by the algo, now to build the path
     std::string current=endLabel;
-    std::vector<std::string> p;
-    unsigned long sum = 0;
+    path.push_back(current);
     do{
-        p.push_back(current); //Add current vertex
         current = prev[current]; //Gets previous vertex of the current vertex
-        sum += findEdge(current, prev[current])->weight; //UNEEDED
+        path.push_back(current); //Add current vertex
     }while(current != startLabel); //While our current is not the initial label (back at the starting point)
 
-    // print path (debug)
-    for (auto i : p)
-        std::cout << i << std::endl;
+    // TODO: reverse path object
 
-    return sum;
+    // print path (debug)
+    for (auto i : path)
+        std::cout << i << " ";
+    std::cout << std::endl << dist[endLabel] << std::endl;
+    return dist[endLabel];
+    // TODO: Fix Graph Destructor
 }
 
 void Graph::clear(){ 

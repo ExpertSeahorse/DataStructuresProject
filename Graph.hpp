@@ -33,10 +33,10 @@ class Edge{
     protected:
     Vertex *end1;
     Vertex *end2;
-    int weight;
+    unsigned long weight;
 
     public:
-    Edge(Vertex* vtx1, Vertex* vtx2, int w): end1(vtx1), end2(vtx2), weight(w) {};
+    Edge(Vertex* vtx1, Vertex* vtx2, unsigned int w): end1(vtx1), end2(vtx2), weight(w) {};
     ~Edge();
 };
 
@@ -64,6 +64,9 @@ class Graph : public GraphBase{
     void addEdge(std::string label1, std::string label2, unsigned long weight);
     void removeEdge(std::string label1, std::string label2);
     unsigned long shortestPath(std::string startLabel, std::string endLabel, std::vector<std::string> &path);
+
+    void printV();
+    void printE();
 
     void clear();
     ~Graph() { clear(); }
