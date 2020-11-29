@@ -5,29 +5,9 @@
 #include <set>
 #include <utility>
 #include <iostream>
+#include <stack>
 
 #include "Graph.hpp"
-
-void Graph::printE(){
-    for (auto i: edges) {
-        std::cout << "Edge: " << i.end1->label << "     " << i.end2->label << "\n";
-    }
-}
-
-void Graph::printV(){
-    for (auto i: vertices) {
-        std::cout << "Vertex: " << i.label << "\n";
-    }
-}
-
-/*
-Vertex::~Vertex(){
-    
-}
-*/
-Edge::~Edge(){
-    end1 = end2 = nullptr;
-}
 
 
 void Graph::addVertex(std::string label){
@@ -39,26 +19,27 @@ void Graph::addVertex(std::string label){
 
     size_v++;
     vertices.emplace_back(label);
-    std::cout << "Added: " << label << std::endl;
 }
 
 void Graph::removeVertex(std::string label){
     // remove vertex with label from list
-    std::size_t s = vertices.size();
-    vertices.erase(findVertex(label));
-  
-    // If nothing was removed
-    if (s == vertices.size())
+    auto i = findVertex(label);
+    if (i == vertices.end())
         throw 1;
 
-    // remove all edges connected to vertex from list
-    edges.erase(findEdge(label, label));
+    for(auto v : i->adjacent){
+        // Remove all edges with this vertex
+        removeEdge(label, v->label);
+
+        // Remove vertex from adjacency list on adjacent vertices
+        v->adjacent.erase(std::remove(v->adjacent.begin(), v->adjacent.end(), &*i), v->adjacent.end());
+    }
+    
     size_v--;
-    std::cout << "Removed: " << label << std::endl;
+    vertices.erase(i);
 }
 
 void Graph::addEdge(std::string label1, std::string label2, unsigned long weight){
-    std::cout << "Starting Edge: " << label1 << ", " << label2 << std::endl;
     // no circular edges
     if (label1 == label2)
         throw 1;
@@ -71,26 +52,10 @@ void Graph::addEdge(std::string label1, std::string label2, unsigned long weight
     if ((i == vertices.end()) || (j == vertices.end()))
         throw 1;
 
-    //Vertex* vtx1 = new Vertex(*i);
-    //Vertex* vtx2 = new Vertex(*j);
     Vertex* vtx1 = &*i;
     Vertex* vtx2 = &*j;
 
-    std::string lab1, lab2;
-    // Make sure that there is not an existing edge
-    /*
-    for (Edge e : edges){
-        lab1 = e.end1->label;
-        lab2 = e.end2->label;
-        if ((lab1 == label1) || (lab1 == lab2)){
-            printE();
-            std::cout << "BBBBBBBBBB" << std::endl;
-            if ((lab2 == label1) || (lab2 == label2))
-                std::cout << "CCCCCCCCCCCCCC" << std::endl;
-        }
-    }
-    */
-    
+    // Make sure that there is not an existing edge    
     if (findEdge(label1, label2) != edges.end())
         throw 1;
     
@@ -99,7 +64,6 @@ void Graph::addEdge(std::string label1, std::string label2, unsigned long weight
     vtx1->adjacent.emplace_back(vtx2);
     vtx2->adjacent.emplace_back(vtx1);
     size_e++;
-    std::cout << "Added: " << label1 << ", " << label2 << std::endl;
 }
 
 void Graph::removeEdge(std::string label1, std::string label2){
@@ -111,7 +75,6 @@ void Graph::removeEdge(std::string label1, std::string label2){
     else
         throw 1;
     size_e--;
-    std::cout << "Removed: " << label1 << ", " << label2 << std::endl;
 }
 
 unsigned long Graph::shortestPath(std::string startLabel, std::string endLabel, std::vector<std::string> &path){
@@ -140,44 +103,38 @@ unsigned long Graph::shortestPath(std::string startLabel, std::string endLabel, 
         auto i = minDistance(dist, vtxs);
         label = *i;
         vtxs.erase(i);
-
         // Add to priority queue ; no current purpose for this, but this pq will hold the max distances at the end of the algo
         short_pq.push(std::make_pair(dist[label], label));
 
         // Update distances + prev node of all adjacent vertices to see if they are lower
         vtx = *findVertex(label);        
+
         for(auto v : vtx.adjacent){ //For every vertex in vtx.adjacent (adjacent list of current vertex) 
             edge_weight = findEdge(v->label, label)->weight;    // Find edge from endpoints
+            
             if (dist[v->label] > (dist[label] + edge_weight)){  // if curr_dist < distance through this node, use shorter distance + update prev node
                 dist[v->label] = dist[label] + edge_weight;
                 prev[v->label] = vtx.label; //Previous of new vertex becomes the current vertex
             }
         }
     }
-
     // All nodes have been charted by the algo, now to build the path
     std::string current=endLabel;
-    path.push_back(current);
+    std::stack<std::string> temp;
+    temp.push(current);
     do{
         current = prev[current]; //Gets previous vertex of the current vertex
-        path.push_back(current); //Add current vertex
+        temp.push(current); //Add current vertex
     }while(current != startLabel); //While our current is not the initial label (back at the starting point)
 
-    // TODO: reverse path object
+    while(!temp.empty()){
+        path.push_back(temp.top());
+        temp.pop();
+    }
 
-    // print path (debug)
-    for (auto i : path)
-        std::cout << i << " ";
-    std::cout << std::endl << dist[endLabel] << std::endl;
     return dist[endLabel];
     // TODO: Fix Graph Destructor
 }
-
-void Graph::clear(){ 
-    for(auto v : vertices)
-        removeVertex(v.label);
-}
-
 
 //####################   Private   ####################
 
