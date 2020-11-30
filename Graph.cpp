@@ -1,10 +1,7 @@
 #include <algorithm>
-#include <queue>
 #include <map>
 #include <limits>
-#include <set>
 #include <utility>
-#include <iostream>
 #include <stack>
 
 #include "Graph.hpp"
@@ -80,12 +77,10 @@ void Graph::removeEdge(std::string label1, std::string label2){
 unsigned long Graph::shortestPath(std::string startLabel, std::string endLabel, std::vector<std::string> &path){
     // Add all vertices to undiscovered list
     // create distance map for max distanc WalkeWe
-    std::list<std::string> vtxs;                // buffer of vertices in string form
+    std::list<std::string> vtxs;                // buffer of vertices in string form "undiscovered vertices"
     std::map<std::string, std::string> prev;    // The node that is before prev[n]
     std::map<std::string, unsigned long> dist;  // Distances of each node from center
-    //std::set<std::string> short_set;          // currently unused
-    std::priority_queue<std::pair<unsigned long, std::string> > short_pq;   // somewhat unused, all nodes are added to it (Holds all of the final distances)
-    
+
     // Create buffer and initialize distance and prev maps
     for (auto v : vertices){
         vtxs.push_back(v.label);
@@ -103,8 +98,6 @@ unsigned long Graph::shortestPath(std::string startLabel, std::string endLabel, 
         auto i = minDistance(dist, vtxs);
         label = *i;
         vtxs.erase(i);
-        // Add to priority queue ; no current purpose for this, but this pq will hold the max distances at the end of the algo
-        short_pq.push(std::make_pair(dist[label], label));
 
         // Update distances + prev node of all adjacent vertices to see if they are lower
         vtx = *findVertex(label);        
@@ -127,6 +120,7 @@ unsigned long Graph::shortestPath(std::string startLabel, std::string endLabel, 
         temp.push(current); //Add current vertex
     }while(current != startLabel); //While our current is not the initial label (back at the starting point)
 
+    // Reverse the path by emptying the stack into the path
     while(!temp.empty()){
         path.push_back(temp.top());
         temp.pop();
